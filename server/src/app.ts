@@ -1,9 +1,9 @@
+import express from 'express';
+import bodyParser from 'body-parser';
+import fs from 'fs';
 import { fileName, defaultData, port } from '../config';
-var express = require('express');
-var bodyParser = require('body-parser');
-var fs = require('fs');
 
-var app = express();
+const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -31,7 +31,9 @@ app.all('/getList', (req, res) => {
 		} else {
 			let json = JSON.parse(data.toString());
 			let result = json.filter((item) =>
-				item.text.toLowerCase().includes(req.query.search.toLowerCase())
+				item.text
+					.toLowerCase()
+					.includes((req.query.search as string).toLowerCase())
 			);
 			res.status(200).send(result);
 		}

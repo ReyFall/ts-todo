@@ -1,12 +1,18 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = require("../config");
-var express = require('express');
-var bodyParser = require('body-parser');
-var fs = require('fs');
-var app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const fs_1 = __importDefault(require("fs"));
+// const express = require('express');
+// const bodyParser = require('body-parser');
+// const fs = require('fs');
+const app = (0, express_1.default)();
+app.use(body_parser_1.default.json());
+app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Access-Control-Allow-Origin, Origin, X-Requested-With, Content-Type, Accept');
@@ -18,21 +24,23 @@ app.get('/', (req, res) => {
 });
 app.all('/getList', (req, res) => {
     res.set({ 'Content-Type': 'text/html; charset=utf-8' });
-    fs.readFile(config_1.fileName, (err, data) => {
+    fs_1.default.readFile(config_1.fileName, (err, data) => {
         console.log(req.query.search);
         if (!req.query.search) {
             res.status(200).send(data.toString());
         }
         else {
             let json = JSON.parse(data.toString());
-            let result = json.filter((item) => item.text.toLowerCase().includes(req.query.search.toLowerCase()));
+            let result = json.filter((item) => item.text
+                .toLowerCase()
+                .includes(req.query.search.toLowerCase()));
             res.status(200).send(result);
         }
     });
 });
 app.post('/addItem', (req, res) => {
     res.set({ 'Content-Type': 'text/html; charset=utf-8' });
-    fs.readFile(config_1.fileName, (err, data) => {
+    fs_1.default.readFile(config_1.fileName, (err, data) => {
         let json = JSON.parse(data.toString());
         let maxId = 0;
         for (let i = 0; i < json.length; i++) {
@@ -45,7 +53,7 @@ app.post('/addItem', (req, res) => {
             text: req.body.text,
             isDone: false,
         });
-        fs.writeFile(config_1.fileName, JSON.stringify(json), (err) => {
+        fs_1.default.writeFile(config_1.fileName, JSON.stringify(json), (err) => {
             if (err)
                 throw err;
             console.log('File updated!');
@@ -55,7 +63,7 @@ app.post('/addItem', (req, res) => {
 });
 app.all('/editItem', (req, res) => {
     res.set({ 'Content-Type': 'text/html; charset=utf-8' });
-    fs.readFile(config_1.fileName, (err, data) => {
+    fs_1.default.readFile(config_1.fileName, (err, data) => {
         console.log(req.query, req.body);
         let json = JSON.parse(data.toString());
         for (let i = 0; i < json.length; i++) {
@@ -66,7 +74,7 @@ app.all('/editItem', (req, res) => {
                     isDone: Boolean(req.body.isDone),
                 };
         }
-        fs.writeFile(config_1.fileName, JSON.stringify(json), (err) => {
+        fs_1.default.writeFile(config_1.fileName, JSON.stringify(json), (err) => {
             if (err)
                 throw err;
             console.log('File updated!');
@@ -76,11 +84,11 @@ app.all('/editItem', (req, res) => {
 });
 app.all('/deleteItem', (req, res) => {
     res.set({ 'Content-Type': 'text/html; charset=utf-8' });
-    fs.readFile(config_1.fileName, (err, data) => {
+    fs_1.default.readFile(config_1.fileName, (err, data) => {
         console.log(req.query, req.body);
         let json = JSON.parse(data.toString());
         json = json.filter((item) => item.id !== Number(req.body.id));
-        fs.writeFile(config_1.fileName, JSON.stringify(json), (err) => {
+        fs_1.default.writeFile(config_1.fileName, JSON.stringify(json), (err) => {
             if (err)
                 throw err;
             console.log('File updated!');
@@ -88,7 +96,7 @@ app.all('/deleteItem', (req, res) => {
         res.status(200).send(json);
     });
 });
-fs.writeFile(config_1.fileName, JSON.stringify(config_1.defaultData), (err) => {
+fs_1.default.writeFile(config_1.fileName, JSON.stringify(config_1.defaultData), (err) => {
     if (err)
         throw err;
     console.log('File created!');
